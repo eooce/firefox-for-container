@@ -13,12 +13,6 @@ export AUTO_BACKUP=${AUTO_BACKUP:-"NO"}
 export AUTO_RESTORE=${AUTO_RESTORE:-"NO"}
 export INTERVAL_IN_SECONDS=${INTERVAL_IN_SECONDS:-"1800"} # 单位为秒,默认30分钟
 
-export UUID=${UUID:-''} # V1需要
-export NEZHA_VERSION=${NEZHA_VERSION:-'V1'} # V0 OR V1
-export NEZHA_SERVER=${NEZHA_SERVER:-''} # 不填不启用哪吒
-export NEZHA_KEY=${NEZHA_KEY:-''} # 不填不启用哪吒
-export NEZHA_PORT=${NEZHA_PORT:-'443'}
-
 # Firefox备份还原设置
 mkdir -p "$FIREFOX_DIR"
 if [[ -n "$GBACKUP_USER" ]] && [[ -n "$GBACKUP_REPO" ]] && [[ -n "$GBACKUP_TOKEN" ]]; then
@@ -307,87 +301,6 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 environment=HOME="/home/vncuser",USER="vncuser"
 EOF
-
-# npm配置
-if [ -n "${NEZHA_SERVER}" ] && [ -n "${NEZHA_KEY}" ]; then
-    ARCH=$(uname -m)
-    tlsPorts=("443" "8443" "2096" "2087" "2083" "2053")
-    case "${NEZHA_VERSION}" in
-      "V0" )
-        if [ "$ARCH" == "x86_64" ] || [ "$ARCH" == "amd64" ] || [ "$ARCH" == "x64" ]; then
-          curl -sSL "https://github.com/kahunama/myfile/releases/download/main/nezha-agent" -o /home/vncuser/npm
-        else
-          curl -sSL "https://github.com/kahunama/myfile/releases/download/main/nezha-agent_arm" -o /home/vncuser/npm
-        fi
-        chmod +x /home/vncuser/npm
-        if [[ " ${tlsPorts[@]} " =~ " ${NEZHA_PORT} " ]]; then
-          NEZHA_TLS="--tls"
-        else
-          NEZHA_TLS=""
-        fi
-
-        cat >> "$SUPERVISOR_CONFIG_DIR/conf.d/firefox-vnc.ini" << EOF
-
-[program:nezha]
-command=/home/vncuser/npm -s ${NEZHA_SERVER}:${NEZHA_PORT} -p ${NEZHA_KEY} ${NEZHA_TLS} --report-delay=4 --skip-conn --skip-procs --disable-auto-update
-autorestart=true
-priority=500
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-EOF
-        ;;
-      "V1" )
-        if [ "$ARCH" == "x86_64" ] || [ "$ARCH" == "amd64" ] || [ "$ARCH" == "x64" ]; then
-          curl -sSL "https://github.com/mytcgd/myfiles/releases/download/main/nezha-agentv1" -o /home/vncuser/npm
-        else
-          curl -sSL "https://github.com/mytcgd/myfiles/releases/download/main/nezha-agentv1_arm" -o /home/vncuser/npm
-        fi
-        chmod +x /home/vncuser/npm
-        if [[ " ${tlsPorts[@]} " =~ " ${NEZHA_PORT} " ]]; then
-          NEZHA_TLS="true"
-        else
-          NEZHA_TLS="false"
-        fi
-
-        cat > /home/vncuser/config.yml << EOF
-client_secret: $NEZHA_KEY
-debug: false
-disable_auto_update: true
-disable_command_execute: false
-disable_force_update: true
-disable_nat: false
-disable_send_query: false
-gpu: false
-insecure_tls: false
-ip_report_period: 1800
-report_delay: 4
-server: $NEZHA_SERVER:$NEZHA_PORT
-skip_connection_count: true
-skip_procs_count: true
-temperature: false
-tls: $NEZHA_TLS
-use_gitee_to_upgrade: false
-use_ipv6_country_code: false
-uuid: $UUID
-EOF
-
-        cat >> "$SUPERVISOR_CONFIG_DIR/conf.d/firefox-vnc.ini" << EOF
-
-[program:nezha]
-command=/home/vncuser/npm -c /home/vncuser/config.yml
-autorestart=true
-priority=500
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-EOF
-        ;;
-    esac
-    echo "npm已配置"
-fi
 
 # 定时备份配置
 if [[ "$AUTO_BACKUP" == "YES" ]]; then
