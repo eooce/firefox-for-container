@@ -65,31 +65,31 @@ EOF
 
 cat > /home/vncuser/.mozilla/firefox/default/prefs.js << EOF
 // 设置中文语言
-user_pref("intl.accept_languages", "zh-CN, zh, en-US, en");
-user_pref("intl.locale.requested", "zh-CN");
-user_pref("general.useragent.locale", "zh-CN");
+pref("intl.accept_languages", "zh-CN, zh, en-US, en");
+pref("intl.locale.requested", "zh-CN");
+pref("general.useragent.locale", "zh-CN");
 
 // 设置主页
-user_pref("browser.startup.homepage", "https://nav.eooce.com");
-user_pref("browser.startup.page", 1); // 启动时显示主页
+pref("browser.startup.homepage", "https://nav.eooce.com");
+pref("browser.startup.page", 1); // 启动时显示主页
 
 // 禁用安全警告
-user_pref("browser.aboutConfig.showWarning", false);
-user_pref("browser.shell.checkDefaultBrowser", false);
+pref("browser.aboutConfig.showWarning", false);
+pref("browser.shell.checkDefaultBrowser", false);
 
 // 禁用更新
-user_pref("app.update.auto", false);
-user_pref("app.update.enabled", false);
-user_pref("app.update.silent", false);
+pref("app.update.auto", false);
+pref("app.update.enabled", false);
+pref("app.update.silent", false);
 
 // 优化性能
-user_pref("gfx.webrender.all", true);
-user_pref("layers.acceleration.force-enabled", true);
+pref("gfx.webrender.all", true);
+pref("layers.acceleration.force-enabled", true);
 
 // 禁用各种提示
-user_pref("browser.tabs.warnOnClose", false);
-user_pref("browser.tabs.warnOnOpen", false);
-user_pref("browser.privatebrowsing.autostart", true);
+pref("browser.tabs.warnOnClose", false);
+pref("browser.tabs.warnOnOpen", false);
+pref("browser.privatebrowsing.autostart", true);
 EOF
 
 # 创建Fluxbox配置
@@ -222,6 +222,6 @@ while true; do
         sleep 5
     fi
     
-    # 每30秒检查一次
-    sleep 30
+    # 每60秒检查一次
+    sleep 60
 done
