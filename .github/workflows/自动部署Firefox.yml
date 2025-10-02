@@ -233,29 +233,18 @@ jobs:
 
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type port; then
+        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --var VNC_PASSWORD="${{ secrets.VNC_PASSWORD || '123456' }}" --health-check-type port; then
           echo "Deployment successful"
         else
           cf delete ${{ env.APP_NAME }} -f
-          echo "伙计,没资源了,部署失败,请明天早上8:20至9:00再尝试部署,已清理失败部署残留"
+          echo "部署失败,试用版可能资源不足，请明天早上8:20至9:00再尝试部署,已清理失败部署残留"
           exit 1
         fi
-        
-    - name: Set environment variables
+
+    - name: Verify deployment
       run: |
-        # VNC密码、分辨率及github备份
-        cf set-env ${{ env.APP_NAME }} RESOLUTION "${{ secrets.RESOLUTION || '1920x1080' }}"
-        cf set-env ${{ env.APP_NAME }} VNC_PASSWORD "${{ secrets.VNC_PASSWORD }}"
-        
-        # 可选：从文件读取环境变量(如果存在)
-        if [ -f .env ]; then
-          while IFS= read -r line; do
-            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
-              IFS='=' read -r key value <<< "$line"
-              cf set-env ${{ env.APP_NAME }} "$key" "$value"
-            fi
-          done < .env
-        fi
+        cf app ${{ env.APP_NAME }}
+        echo "Deployment completed successfully!"
 
         # 获取应用url
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
@@ -265,15 +254,6 @@ jobs:
         else
           echo "⚠️ 未找到应用路由，无法设置 DOMAIN,请手动将节点里的address、host和sni改为应用域名"
         fi
-
-    - name: Restage application
-      run: |
-        cf restage ${{ env.APP_NAME }}
-
-    - name: Verify deployment
-      run: |
-        cf app ${{ env.APP_NAME }}
-        echo "Deployment completed successfully!"
         
     - name: 详细部署信息
       run: |
