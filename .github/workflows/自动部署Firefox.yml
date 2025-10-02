@@ -244,14 +244,8 @@ jobs:
     - name: Set environment variables
       run: |
         # VNC密码、分辨率及github备份
-        cf set-env ${{ env.APP_NAME }} AUTO_BACKUP "${{ secrets.AUTO_BACKUP }}"
-        cf set-env ${{ env.APP_NAME }} AUTO_RESTORE "${{ secrets.AUTO_RESTORE }}"
-        cf set-env ${{ env.APP_NAME }} INTERVAL_IN_SECONDS "${{ secrets.INTERVAL_IN_SECONDS }}"
+        cf set-env ${{ env.APP_NAME }} RESOLUTION "${{ secrets.RESOLUTION || '1920x1080' }}"
         cf set-env ${{ env.APP_NAME }} VNC_PASSWORD "${{ secrets.VNC_PASSWORD }}"
-        cf set-env ${{ env.APP_NAME }} RESOLUTION "${{ secrets.RESOLUTION }}"
-        cf set-env ${{ env.APP_NAME }} GBACKUP_USER "${{ secrets.GBACKUP_USER }}"
-        cf set-env ${{ env.APP_NAME }} GBACKUP_REPO "${{ secrets.GBACKUP_REPO }}"
-        cf set-env ${{ env.APP_NAME }} GBACKUP_TOKEN "${{ secrets.GBACKUP_TOKEN }}"
         
         # 可选：从文件读取环境变量(如果存在)
         if [ -f .env ]; then
