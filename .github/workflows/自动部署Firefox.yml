@@ -245,16 +245,7 @@ jobs:
       run: |
         cf app ${{ env.APP_NAME }}
         echo "Deployment completed successfully!"
-
-        # 获取应用url
-        ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
-        if [ -n "$ROUTE" ]; then
-          echo "设置 DOMAIN 环境变量为: $ROUTE"
-          cf set-env ${{ env.APP_NAME }} DOMAIN "$ROUTE"
-        else
-          echo "⚠️ 未找到应用路由，无法设置 DOMAIN,请手动将节点里的address、host和sni改为应用域名"
-        fi
-        
+    
     - name: 详细部署信息
       run: |
         echo "🚀 部署完成！详细信息如下："
