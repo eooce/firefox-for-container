@@ -5,7 +5,6 @@ RUN apk update && \
     apk add --no-cache \
         tzdata \
         curl \
-        supervisor \
         xvfb \
         x11vnc \
         novnc \
@@ -15,7 +14,9 @@ RUN apk update && \
         firefox \
         bash \
         git \
-        rsync && \
+        rsync \
+        procps \
+        xterm && \
     # 设置时区
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
@@ -23,16 +24,16 @@ RUN apk update && \
     cp /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
     # 创建非特权用户
     adduser -D -s /bin/bash vncuser && \
-    # 设置firefox持久化目录
+    # 创建必要目录
     mkdir -p /home/vncuser/.mozilla/firefox && \
-    chown -R vncuser:vncuser /home/vncuser/.mozilla/firefox && \
-    # 创建/config符号链接，指向Firefox配置目录
-    ln -sf /home/vncuser/.mozilla/firefox /config
+    mkdir -p /home/vncuser/.config && \
+    mkdir -p /home/vncuser/tmp && \
+    chown -R vncuser:vncuser /home/vncuser
 
 # 复制启动脚本并设置权限
 COPY start.sh /home/vncuser/start.sh
 RUN chmod +x /home/vncuser/start.sh && \
-    chown -R vncuser:vncuser /home/vncuser/
+    chown vncuser:vncuser /home/vncuser/start.sh
 
 # 声明暴露的端口
 EXPOSE 8080 5900
