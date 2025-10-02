@@ -33,10 +33,8 @@ RUN apk update && \
 
 # 复制启动脚本和Firefox配置文件并设置权限
 COPY start.sh /home/vncuser/start.sh
-COPY firefox-prefs.js /home/vncuser/firefox-prefs.js
 RUN chmod +x /home/vncuser/start.sh && \
-    chown vncuser:vncuser /home/vncuser/start.sh && \
-    chown vncuser:vncuser /home/vncuser/firefox-prefs.js
+    chown vncuser:vncuser /home/vncuser/start.sh
 
 # 声明暴露的端口
 EXPOSE 8080
