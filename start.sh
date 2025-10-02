@@ -3,7 +3,7 @@
 # 配置变量
 export PORT=${PORT:-"8080"}
 export VNC_PASSWORD=${VNC_PASSWORD:-"123456"}
-export RESOLUTION=${RESOLUTION:-"1920x1080"}
+export RESOLUTION=${RESOLUTION:-"1366x768"}
 export DISPLAY=:0
 export HOME=/home/vncuser
 export USER=vncuser
