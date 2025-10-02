@@ -1,13 +1,19 @@
 #!/bin/bash
 
-# 配置变量
+# 配置变量（使用环境变量或默认值）
 export PORT=${PORT:-"8080"}
 export VNC_PASSWORD=${VNC_PASSWORD:-"123456"}
 export RESOLUTION=${RESOLUTION:-"1366x768"}
+export LANG=${LANG:-"zh_CN.UTF-8"}
+export LANGUAGE=${LANGUAGE:-"zh_CN:zh"}
+export LC_ALL=${LC_ALL:-"zh_CN.UTF-8"}
 export DISPLAY=:0
 export HOME=/home/vncuser
 export USER=vncuser
 export TMPDIR=/home/vncuser/tmp
+
+# 设置默认主页
+export HOME_PAGE=${HOME_PAGE:-"https://nav.eooce.com"}
 
 # 创建必要目录
 mkdir -p /home/vncuser/.vnc
@@ -15,6 +21,12 @@ mkdir -p /home/vncuser/.fluxbox
 mkdir -p /home/vncuser/tmp
 mkdir -p /tmp/.X11-unix
 mkdir -p /home/vncuser/.mozilla/firefox
+
+# 如果Firefox配置目录为空，则复制默认配置
+if [ ! -f /home/vncuser/.mozilla/firefox/profiles.ini ]; then
+    echo "初始化Firefox配置..."
+    cp /home/vncuser/firefox-prefs.js /home/vncuser/.mozilla/firefox/prefs.js
+fi
 
 # 设置权限
 chmod 700 /home/vncuser/.vnc
@@ -53,7 +65,12 @@ EOF
 cat > /home/vncuser/.fluxbox/startup << EOF
 #!/bin/bash
 # Fluxbox启动脚本
-firefox --kiosk --width=${VNC_WIDTH} --height=${VNC_HEIGHT} about:blank &
+# 使用环境变量设置的语言
+export LANG=$LANG
+export LANGUAGE=$LANGUAGE
+export LC_ALL=$LC_ALL
+
+firefox --kiosk --width=${VNC_WIDTH} --height=${VNC_HEIGHT} ${HOME_PAGE} &
 EOF
 
 chmod +x /home/vncuser/.fluxbox/startup
@@ -61,7 +78,7 @@ chown -R vncuser:vncuser /home/vncuser/.fluxbox
 
 echo "🚀 启动Xvfb显示服务器..."
 # 启动Xvfb（显示服务器）
-Xvfb :0 -screen 0 ${VNC_WIDTH}x${VNC_HEIGHT}x${VNC_DEPTH} -ac +extension RANDR -nolisten tcp -noreset &
+Xvfb :0 -screen 0 ${VNC_WIDTH}x${VNC_HEIGHT}x${VNC_DEPTH} -ac +extension RANDR -nolisten tcp -noreset -dpi 96 &
 XVFB_PID=$!
 
 # 等待Xvfb启动
@@ -82,20 +99,25 @@ FLUXBOX_PID=$!
 sleep 2
 
 echo "🚀 启动x11vnc服务器..."
-# 启动x11vnc（使用默认端口5900，但只在容器内部访问）
-x11vnc -display :0 -forever -shared -passwd "$VNC_PASSWORD" -rfbport 5900 -localhost -noxdamage -xrandr &
+# 启动x11vnc
+x11vnc -display :0 -forever -shared -passwd "$VNC_PASSWORD" -rfbport 5900 -noxdamage -xrandr -localhost &
 X11VNC_PID=$!
 sleep 2
 
 echo "🚀 启动noVNC网页客户端..."
-# 启动noVNC（作为反向代理，将外部8080端口请求转发到内部5900端口）
-websockify --web /usr/share/novnc $PORT localhost:5900 &
+# 启动noVNC
+if [ -d "/usr/share/novnc" ]; then
+    websockify --web /usr/share/novnc $PORT localhost:5900 &
+else
+    websockify $PORT localhost:5900 &
+fi
 NOVNC_PID=$!
 sleep 2
 
 echo "🚀 启动Firefox浏览器..."
 # 启动Firefox（使用fluxbox的startup脚本）
-firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} about:blank &
+# 或者直接启动
+firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} ${HOME_PAGE} &
 FIREFOX_PID=$!
 
 echo "==========================================="
@@ -103,6 +125,8 @@ echo "✅ 所有服务启动完成！"
 echo "📺 VNC 分辨率: ${RESOLUTION}"
 echo "🔑 VNC 密码: ${VNC_PASSWORD}"
 echo "🌐 访问地址: http://localhost:${PORT}"
+echo "🌐 语言环境: $LANG"
+echo "🏠 默认主页: $HOME_PAGE"
 echo "==========================================="
 
 # 检查所有进程是否在运行
