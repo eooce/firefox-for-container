@@ -82,24 +82,19 @@ FLUXBOX_PID=$!
 sleep 2
 
 echo "🚀 启动x11vnc服务器..."
-# 启动x11vnc
-x11vnc -display :0 -forever -shared -passwd "$VNC_PASSWORD" -rfbport 5900 -noxdamage -xrandr &
+# 启动x11vnc（使用默认端口5900，但只在容器内部访问）
+x11vnc -display :0 -forever -shared -passwd "$VNC_PASSWORD" -rfbport 5900 -localhost -noxdamage -xrandr &
 X11VNC_PID=$!
 sleep 2
 
 echo "🚀 启动noVNC网页客户端..."
-# 启动noVNC
-if [ -d "/usr/share/novnc" ]; then
-    websockify --web /usr/share/novnc $PORT localhost:5900 &
-else
-    websockify $PORT localhost:5900 &
-fi
+# 启动noVNC（作为反向代理，将外部8080端口请求转发到内部5900端口）
+websockify --web /usr/share/novnc $PORT localhost:5900 &
 NOVNC_PID=$!
 sleep 2
 
 echo "🚀 启动Firefox浏览器..."
 # 启动Firefox（使用fluxbox的startup脚本）
-# 或者直接启动
 firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} about:blank &
 FIREFOX_PID=$!
 
