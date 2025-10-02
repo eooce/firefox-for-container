@@ -63,35 +63,6 @@ Path=default
 Default=1
 EOF
 
-cat > /home/vncuser/.mozilla/firefox/default/prefs.js << EOF
-// 设置中文语言
-pref("intl.accept_languages", "zh-CN, zh, en-US, en");
-pref("intl.locale.requested", "zh-CN");
-pref("general.useragent.locale", "zh-CN");
-
-// 设置主页
-pref("browser.startup.homepage", "https://nav.eooce.com");
-pref("browser.startup.page", 1); // 启动时显示主页
-
-// 禁用安全警告
-pref("browser.aboutConfig.showWarning", false);
-pref("browser.shell.checkDefaultBrowser", false);
-
-// 禁用更新
-pref("app.update.auto", false);
-pref("app.update.enabled", false);
-pref("app.update.silent", false);
-
-// 优化性能
-pref("gfx.webrender.all", true);
-pref("layers.acceleration.force-enabled", true);
-
-// 禁用各种提示
-pref("browser.tabs.warnOnClose", false);
-pref("browser.tabs.warnOnOpen", false);
-pref("browser.privatebrowsing.autostart", true);
-EOF
-
 # 创建Fluxbox配置
 cat > /home/vncuser/.fluxbox/init << EOF
 session.screen0.workspaces: 1
@@ -222,6 +193,6 @@ while true; do
         sleep 5
     fi
     
-    # 每60秒检查一次
-    sleep 60
+    # 每30秒检查一次
+    sleep 30
 done

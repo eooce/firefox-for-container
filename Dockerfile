@@ -17,7 +17,8 @@ RUN apk update && \
         rsync \
         procps \
         xterm \
-        wqy-zenhei && \
+        wqy-zenhei \
+        dbus && \
     # 设置时区
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
@@ -29,12 +30,17 @@ RUN apk update && \
     mkdir -p /home/vncuser/.mozilla/firefox && \
     mkdir -p /home/vncuser/.config && \
     mkdir -p /home/vncuser/tmp && \
-    chown -R vncuser:vncuser /home/vncuser
+    mkdir -p /var/run/dbus && \
+    chown -R vncuser:vncuser /home/vncuser && \
+    chown -R vncuser:vncuser /var/run/dbus
 
-# 复制启动脚本和Firefox配置文件并设置权限
+# 复制启动脚本并设置权限
 COPY start.sh /home/vncuser/start.sh
+COPY prefs.js /home/vncuser/.mozilla/firefox/default/prefs.js
 RUN chmod +x /home/vncuser/start.sh && \
-    chown vncuser:vncuser /home/vncuser/start.sh
+    chmod +x /home/vncuser/.mozilla/firefox/default/prefs.js && \
+    chown vncuser:vncuser /home/vncuser/.mozilla/firefox/default/prefs.js && \
+    chown vncuser:vncuser /home/vncuser/start.sh 
 
 # 声明暴露的端口
 EXPOSE 8080
