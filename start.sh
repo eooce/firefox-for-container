@@ -158,11 +158,11 @@ else
     export LANG=zh_CN.UTF-8
     export LANGUAGE=zh_CN:zh
     export LC_ALL=zh_CN.UTF-8
-    firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} https://nav.eooce.com > /home/vncuser/firefox.log 2>&1 &
+    firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} https://nav.eooce.com >/dev/null 2>&1 &
     sleep 5
     FIREFOX_PID=$(pgrep -f firefox || true)
     if [ -n "$FIREFOX_PID" ]; then
-        echo "✅ Firefox 手动启动成功 (PID: $FIREFOX_PID)"
+        echo "✅ Firefox 启动成功 (PID: $FIREFOX_PID)"
     else
         echo "❌ Firefox 启动失败"
         if [ -f /home/vncuser/firefox.log ]; then
@@ -189,10 +189,10 @@ while true; do
     # 如果Firefox退出，尝试重新启动
     if ! pgrep -f firefox > /dev/null; then
         echo "⚠️  Firefox 已停止，尝试重新启动..."
-        firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} https://nav.eooce.com > /home/vncuser/firefox.log 2>&1 &
+        firefox --display=:0 --width=${VNC_WIDTH} --height=${VNC_HEIGHT} >/dev/null 2>&1 &
         sleep 5
     fi
     
-    # 每30秒检查一次
-    sleep 30
+    # 每120秒检查一次
+    sleep 120
 done
