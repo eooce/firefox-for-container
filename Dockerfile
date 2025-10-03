@@ -18,7 +18,16 @@ RUN apk update && \
         procps \
         xterm \
         wqy-zenhei \
-        dbus && \
+        dbus \
+        # 添加中文字体
+        font-noto-emoji \
+        font-noto \
+        font-noto-cjk \
+        font-noto-extra \
+        # 添加locale支持
+        musl-locales \
+        musl-locales-lang \
+        && \
     # 设置时区
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
@@ -38,9 +47,13 @@ RUN apk update && \
 COPY start.sh /home/vncuser/start.sh
 COPY prefs.js /home/vncuser/.mozilla/firefox/default/prefs.js
 RUN chmod +x /home/vncuser/start.sh && \
-    chmod +x /home/vncuser/.mozilla/firefox/default/prefs.js && \
     chown vncuser:vncuser /home/vncuser/.mozilla/firefox/default/prefs.js && \
     chown vncuser:vncuser /home/vncuser/start.sh 
+
+# 设置环境变量（在构建时设置）
+ENV LANG=zh_CN.UTF-8
+ENV LANGUAGE=zh_CN:zh
+ENV LC_ALL=zh_CN.UTF-8
 
 # 声明暴露的端口
 EXPOSE 8080
