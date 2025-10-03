@@ -5,7 +5,7 @@ user_pref("general.useragent.locale", "zh-CN");
 
 // 设置主页
 user_pref("browser.startup.homepage", "https://nav.eooce.com");
-user_pref("browser.startup.page", 1); // 启动时显示主页
+user_pref("browser.startup.page", 2); // 启动时显示用户配置的页面
 
 // 禁用安全警告
 user_pref("browser.aboutConfig.showWarning", false);
@@ -23,4 +23,5 @@ user_pref("layers.acceleration.force-enabled", true);
 // 禁用各种提示
 user_pref("browser.tabs.warnOnClose", false);
 user_pref("browser.tabs.warnOnOpen", false);
+
 user_pref("browser.privatebrowsing.autostart", true);
