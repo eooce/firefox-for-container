@@ -50,4 +50,4 @@ USER vncuser
 WORKDIR /home/vncuser
 
 # 设置默认启动命令
-CMD ["./start.sh"]
+CMD ["sh", "-c", "./start.sh & tail -f /dev/null"]
