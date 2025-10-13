@@ -14,8 +14,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - VNC_PASSWORD=123456
+      - VNC_PASSWORD=123456  # vnc密码
     volumes:
-      # 将主机目录挂载到容器的独立数据目录，避免覆盖启动脚本
-      - ./home/vncuser_data:/data/vncuser
+      - ./home/vncuser_data:/data/vncuser # 持久化存储
 ```
